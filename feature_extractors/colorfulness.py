@@ -25,3 +25,50 @@ def hs_colorfulness_smoothed(image: cv2.typing.MatLike) -> float:
     #of noise, compression, or dithering
     image = cv2.GaussianBlur(image, (3,3),0)
     return hs_colorfulness(image)
+
+def lab_colorfulness(image: cv2.typing.MatLike) -> float:
+    #takes in cv2 BGR image and converts it into CIELAB to calculate perceptual chroma
+    #because CIELAB is perceptul, this chroma should closely correlate to human colorfulness perception
+    lab_image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
+
+    l, a, b = cv2.split(lab_image)
+
+    chroma = np.sqrt(a**2 + b**2)
+    mean_chroma = chroma.mean()
+    std_chroma = chroma.std()
+
+    colorfulness = mean_chroma + 0.3 * std_chroma #0.3 seems to be standard weighting among papers
+    return colorfulness
+
+def hsv_colorfulness(image: cv2.typing.MatLike, k:float = 0.3) -> float:
+    #HSV naturally breaks an image apart into hue, saturation, and value (brightness)
+    # so it makes a natural choice for calculating colorfulness which is normally tied to saturation in human vision
+
+    hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+    h,s,v = cv2.split(hsv_image)
+
+    saturation_mean = s.mean()
+    saturation_std = s.std()
+    value_mean = v.mean()
+
+    colorfulness = saturation_std + 0.3 * saturation_mean - k * np.abs(value_mean-128) #the last bit at the end is to make darker images less "colorful"
+
+    return colorfulness
+
+def entropic_colorfulness(image: cv2.typing.MatLike) -> float:
+    #this is the most unique colorfulness metric, as it relies on creating color histograms
+    #and calculating the entropy of them
+    lab_image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB) #convert to LAB so we're in a perceptual color space
+    histogram = cv2.calcHist([lab_image], [0,1,2],None, [32,32,32], [0,256,0,256,0,256] )
+
+    total_pixels = np.sum(histogram)
+    if total_pixels==0:
+        return 0
+
+    probabilities = histogram / total_pixels #this basically transforms it into a probability distribution
+    non_zero_probs = probabilities[probabilities > 0] #filter out all the 0 probabilities to avoid log of 0
+
+    entropy = -1 * np.sum(non_zero_probs * np.log2(non_zero_probs))
+    normalized_entropy = entropy /  15.0 #dividing by the log_2 of the total number of bins to get the normalized entropy, and log_2 of 32**3 is 15
+    return normalized_entropy
