@@ -1,1 +1,1 @@
-__all__ = ["colorfulness"]
+__all__ = ["colorfulness", "sharpness"]
