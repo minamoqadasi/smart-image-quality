@@ -46,6 +46,34 @@ def entropic_sharpness(image: cv2.typing.MatLike) -> float:
     image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     return shannon_entropy(image_gray)
 
+def hfer_sharpness(image: cv2.typing.MatLike, cutoff_ratio:float = 0.1) -> float:
+    #by applying a fourier transform to the image it can be converted into the frequency domain
+    #since perceptual sharpness is highly correlated with high-frequency, this makes for a decent method
+    #to determine image sharpness. by checking the ratio of high frequency components to total components,
+    # we get the High Frequency Energy Ratio, a suitable proxy for sharpness
+
+    image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    image_fourier_space = np.fft.fft2(image_gray)
+    image_fourier_shifted = np.fft.fftshift(image_fourier_space) #this shifts it so that the 0-component of frequency space is the center
+    frequency_magnitude_spectrum = np.abs(image_fourier_shifted) #need to calculate magnitude because by default this is complex numbers
+
+    rows, columns = image_gray.shape
+    center_row, center_column = rows // 2, columns // 2
+
+    radius = int(min(rows, columns) * cutoff_ratio) #this determines the radius of the low-frequency exclusion zone
+
+    y, x = np.ogrid[:rows, :columns]
+    dist_from_center = np.hypot(x-center_column, y-center_row)
+    high_frequency_mask = dist_from_center > radius #create a circular mask around the center of the space
+
+    total_energy = np.sum(frequency_magnitude_spectrum**2) #funny little thing called parseval's theorem ensures that this is the equivalent energy to the spatial representation
+    high_frequency_energy = np.sum((frequency_magnitude_spectrum[high_frequency_mask])**2)
+
+    if total_energy == 0.0:
+        return 0.0
+
+    sharpness = high_frequency_energy / total_energy
+    return sharpness
 
 
 
