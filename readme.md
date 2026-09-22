@@ -8,3 +8,24 @@ The datasets being used for this project are the following:
   - https://database.mmsp-kn.de/koniq-10k-database.html
 - LIVE In The Wild Image Quality Assessment database
   - https://live.ece.utexas.edu/research/ChallengeDB/
+
+Dataset folder structure should be as follows:
+```commandline
+datasets
+├── biq2021
+│   ├── BIQ2021.csv
+│   └── images
+│       └── <images>
+├── koniq
+│   ├── images
+│   │   └── <images>
+│   ├── koniq10k_indicators.csv
+│   └── koniq10k_scores_and_distributions.csv
+└── livewild
+    ├── AllImages_release.mat
+    ├── AllMOS_release.mat
+    ├── AllStdDev_release.mat
+    ├── images
+    │   └── <images>
+    └── README.txt
+```
