@@ -32,6 +32,9 @@ def process_dataset(image_dir: str, output_csv: str = "dataset_features.csv"):
             "sharpness_tenengrad_variance": sharpness.tenengrad_variance_sharpness(image),
             "sharpness_entropy": sharpness.entropic_sharpness(image),
             "sharpness_hfer": sharpness.hfer_sharpness(image),
+            "gaussian_noise": noise.guassian_noise(image),
+            "median_noise": noise.median_noise(image),
+            "gaussian_snr": noise.snr(image)
         }
         data.append(features)
 
