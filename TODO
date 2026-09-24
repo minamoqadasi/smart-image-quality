@@ -2,6 +2,9 @@ Current state:
 - We have 4 features to extract
 
 TODO:
+- merge the two datasets
+
+
+DONE:
 - extract the features on each dataset
 - adding noise extraction feature
-- merge the two datasets
