@@ -1,0 +1,42 @@
+from pathlib import Path
+import pandas as pd
+import cv2
+
+import brightness
+import colorfulness
+import contrast
+import sharpness
+
+def process_dataset(image_dir: str, output_csv: str = "dataset_features.csv"):
+    image_paths = list(Path(image_dir).glob("*.jpg")) + list(Path(image_dir).glob("*.png"))
+
+    data = []
+    for path in image_paths:
+        image = cv2.imread(str(path))
+        if image is None:
+            continue
+
+        features = {
+            "filename": path.name,
+            "brightness": brightness.grayscale_brightness(image),
+            "brightness_hsv": brightness.hsv_brightness(image),
+            "colorfulness_hs": colorfulness.hs_colorfulness(image),
+            "colorfulness_hs_smoothed": colorfulness.hs_colorfulness_smoothed(image),
+            "colorfulness_lab": colorfulness.lab_colorfulness(image),
+            "colorfulness_hsv": colorfulness.hsv_colorfulness(image),
+            "colorfulness_entropy": colorfulness.entropic_colorfulness(image),
+            "contrast_rms": contrast.rms_contrast(image),
+            "contrast_michelson": contrast.michelson_contrast(image),
+            "contrast_rms_smoothed": contrast.rms_contrast_smoothed(image),
+            "sharpness_laplacian": sharpness.laplacian_sharpness(image),
+            "sharpness_laplacian_bilateral": sharpness.laplacian_sharpness_bilateral(image),
+            "sharpness_tenengrad": sharpness.tenengrad_sharpness(image),
+            "sharpness_tenengrad_variance": sharpness.tenengrad_variance_sharpness(image),
+            "sharpness_entropy": sharpness.entropic_sharpness(image),
+            "sharpness_hfer": sharpness.hfer_sharpness(image),
+        }
+        data.append(features)
+
+    df = pd.DataFrame(data)
+    df.to_csv(output_csv, index=False)
+    return df
