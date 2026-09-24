@@ -2,10 +2,8 @@ from pathlib import Path
 import pandas as pd
 import cv2
 
-import brightness
-import colorfulness
-import contrast
-import sharpness
+from feature_extractors import *
+
 
 def process_dataset(image_dir: str, output_csv: str = "dataset_features.csv"):
     image_paths = list(Path(image_dir).glob("*.jpg")) + list(Path(image_dir).glob("*.png"))
