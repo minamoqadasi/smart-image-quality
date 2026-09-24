@@ -3,4 +3,5 @@ Current state:
 
 TODO:
 - extract the features on each dataset
-- add error handling
+- adding noise extraction feature
+- merge the two datasets
