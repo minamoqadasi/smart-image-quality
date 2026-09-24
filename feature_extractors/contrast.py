@@ -15,8 +15,8 @@ def michelson_contrast(image: cv2.typing.MatLike) -> float:
     
     image_float = image_gray.astype(float)
     
-    i_min = image_float.min()
-    i_max = image_float.max()
+    i_min = float(image_float.min())
+    i_max = float(image_float.max())
     
     denominator = i_max + i_min
     if denominator == 0:
