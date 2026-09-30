@@ -2,7 +2,7 @@ from pathlib import Path
 import pandas as pd
 import cv2
 
-from feature_extractors import *
+from feature_extractors import brightness, colorfulness, contrast, sharpness, noise
 
 
 def process_dataset(image_dir: str, output_csv: str = "dataset_features.csv"):
