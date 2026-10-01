@@ -41,16 +41,35 @@ def process_koniq(dataset_root: pathlib.Path = Path("datasets/")) -> pandas.Data
         image_features_list.append(image_features)
 
     image_feature_df = pd.DataFrame(image_features_list)
-    print(image_feature_df)
+    # print(image_feature_df)
 
-    joint_df.join(image_feature_df.set_index('image_name'))
+    joint_df = joint_df.join(image_feature_df.set_index('image_name'))
 
     return joint_df
 
-def process_biq(dataset_root: pathlib.Path = Path("datasets/")):
+def process_biq(dataset_root: pathlib.Path = Path("datasets/")) -> pandas.DataFrame:
     biq_root = dataset_root / "biq2021"
     biq_csv = biq_root / "BIQ2021.csv"
-    biq_images = biq_root / "images"
+    biq_image_path = biq_root / "images"
+
+    score_df = pd.read_csv(biq_csv)
+    score_df=score_df.rename(columns={"StandardDeviation":"SD","Images":"image_name"})
+    #biq doesn't have any unnecessary columns so no need to drop anything, and it's all in [0,1] already
+
+    image_features_list = []
+    for image_name in tqdm(score_df['image_name']):
+        image = cv2.imread(biq_image_path/image_name)
+        if image is None:
+            continue
+        image_features = extract_image_features(image)
+        image_features['image_name'] = image_name
+        image_features_list.append(image_features)
+    image_feature_df = pd.DataFrame(image_features_list)
+
+    joint_df = score_df.set_index('image_name').join(image_feature_df.set_index('image_name'))
+
+    return joint_df
 
 if __name__ == "__main__":
     process_koniq()
+    process_biq()
