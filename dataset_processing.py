@@ -2,6 +2,7 @@ import pathlib
 from pathlib import Path
 import pandas
 import cv2
+from tqdm import tqdm
 
 from feature_extractors import extract_image_features
 import pandas as pd
@@ -29,7 +30,7 @@ def process_koniq(dataset_root: pathlib.Path = Path("datasets/")) -> pandas.Data
     joint_df['image_name'] = joint_df.index
 
     image_features_list = []
-    for image_name in joint_df['image_name']:
+    for image_name in tqdm(joint_df['image_name']):
         image = cv2.imread(koniq_images_path/image_name)
         if image is None:
             #this is just a graceful way of handling if an image is, for some reason, not actually there
