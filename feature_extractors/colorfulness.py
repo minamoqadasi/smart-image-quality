@@ -41,7 +41,6 @@ def lab_colorfulness(image: cv2.typing.MatLike) -> float:
         raise ValueError
 
     colorfulness = mean_chroma + 0.3 * std_chroma #0.3 seems to be standard weighting among papers
-    print(colorfulness)
     return colorfulness
 
 def hsv_colorfulness(image: cv2.typing.MatLike, k:float = 0.3) -> float:
