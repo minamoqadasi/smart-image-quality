@@ -44,7 +44,7 @@ def process_dataset(image_dir: str, output_csv: str = "dataset_features.csv"):
 
 def extract_image_features(image: cv2.typing.MatLike) -> dict[str, float]:
     features = {
-        "brightness": brightness.grayscale_brightness(image),
+        "brightness_mean": brightness.grayscale_brightness(image),
         "brightness_hsv": brightness.hsv_brightness(image),
         "colorfulness_hs": colorfulness.hs_colorfulness(image),
         "colorfulness_hs_smoothed": colorfulness.hs_colorfulness_smoothed(image),
