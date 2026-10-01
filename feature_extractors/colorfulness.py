@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 import cv2
 
@@ -30,14 +32,16 @@ def lab_colorfulness(image: cv2.typing.MatLike) -> float:
     #takes in cv2 BGR image and converts it into CIELAB to calculate perceptual chroma
     #because CIELAB is perceptul, this chroma should closely correlate to human colorfulness perception
     lab_image = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
-
-    l, a, b = cv2.split(lab_image)
-
+    l, a, b = cv2.split(lab_image.astype(int))
     chroma = np.sqrt(a**2 + b**2)
     mean_chroma = chroma.mean()
     std_chroma = chroma.std()
+    if(math.isinf(std_chroma)):
+        #for some reason some of the images are returning infinite colorfulness so. stop that
+        raise ValueError
 
     colorfulness = mean_chroma + 0.3 * std_chroma #0.3 seems to be standard weighting among papers
+    print(colorfulness)
     return colorfulness
 
 def hsv_colorfulness(image: cv2.typing.MatLike, k:float = 0.3) -> float:
