@@ -1,3 +1,4 @@
+import os
 import pathlib
 from pathlib import Path
 import pandas
@@ -43,7 +44,7 @@ def process_koniq(dataset_root: pathlib.Path = Path("datasets/")) -> pandas.Data
     image_feature_df = pd.DataFrame(image_features_list)
     # print(image_feature_df)
 
-    joint_df = joint_df.join(image_feature_df.set_index('image_name'))
+    joint_df = joint_df.set_index('image_name').join(image_feature_df.set_index('image_name'))
 
     return joint_df
 
@@ -71,5 +72,18 @@ def process_biq(dataset_root: pathlib.Path = Path("datasets/")) -> pandas.DataFr
     return joint_df
 
 if __name__ == "__main__":
-    process_koniq()
-    process_biq()
+
+    output_folder = Path('output/')
+    os.makedirs(output_folder, exist_ok=True)
+    koniq_df = process_koniq()
+    biq_df = process_biq()
+
+    koniq_df.to_csv(output_folder/'processed_koniq.csv')
+    biq_df.to_csv(output_folder/'processed_biq.csv')
+    # koniq_df = pd.read_csv(output_folder/'processed_koniq.csv')
+    # biq_df = pd.read_csv(output_folder/'processed_biq.csv')
+    koniq_df['dataset'] = 'koniq'
+    biq_df['dataset'] = 'biq2021'
+
+    joint_df = koniq_df.merge(biq_df, how='outer')
+    joint_df.to_csv(output_folder/'processed_merged.csv')
