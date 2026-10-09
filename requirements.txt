@@ -4,3 +4,4 @@ scikit-image~=0.26.0
 pandas
 tqdm
 matplotlib
+tabulate
