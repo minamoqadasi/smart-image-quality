@@ -6,8 +6,6 @@ The datasets being used for this project are the following:
   - https://www.kaggle.com/datasets/nisarahmedrana/biq2021
 - KonIQ-10k Image Quality Assessment database
   - https://database.mmsp-kn.de/koniq-10k-database.html
-- LIVE In The Wild Image Quality Assessment database
-  - https://live.ece.utexas.edu/research/ChallengeDB/
 
 Dataset folder structure should be as follows:
 ```commandline
