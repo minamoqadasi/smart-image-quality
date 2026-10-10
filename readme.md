@@ -16,16 +16,10 @@ datasets
 │   ├── BIQ2021.csv
 │   └── images
 │       └── <images>
-├── koniq
-│   ├── images
-│   │   └── <images>
-│   ├── koniq10k_indicators.csv
-│   └── koniq10k_scores_and_distributions.csv
-└── livewild
-    ├── AllImages_release.mat
-    ├── AllMOS_release.mat
-    ├── AllStdDev_release.mat
-    ├── images
-    │   └── <images>
-    └── README.txt
+└── koniq
+    ├── images
+    │   └── <images>
+    ├── koniq10k_indicators.csv
+    └── koniq10k_scores_and_distributions.csv
+
 ```
