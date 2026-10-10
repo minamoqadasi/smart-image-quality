@@ -218,3 +218,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+
+# Local datasets — do not publish to GitHub
+datasets/
+
+# Generated output files
+output/
