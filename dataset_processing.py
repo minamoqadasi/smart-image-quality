@@ -50,7 +50,7 @@ def process_koniq(dataset_root: pathlib.Path = Path("datasets/")) -> pd.DataFram
 def process_biq(dataset_root: pathlib.Path = Path("datasets/")) -> pd.DataFrame:
     biq_root = dataset_root / "biq2021"
     biq_csv = biq_root / "BIQ2021.csv"
-    biq_image_path = biq_root
+    biq_image_path = biq_root / "images"
 
     score_df = pd.read_csv(biq_csv)
     score_df=score_df.rename(columns={"StandardDeviation":"SD","Images":"image_name"})
