@@ -1,7 +1,6 @@
 import os
 import pathlib
 from pathlib import Path
-import pandas
 import cv2
 from tqdm import tqdm
 
@@ -9,7 +8,7 @@ from feature_extractors import extract_image_features
 import pandas as pd
 import numpy as np
 
-def process_koniq(dataset_root: pathlib.Path = Path("datasets/")) -> pandas.DataFrame:
+def process_koniq(dataset_root: pathlib.Path = Path("datasets/")) -> pd.DataFrame:
     koniq_root: pathlib.Path = dataset_root / "koniq"
     koniq_score_csv: pathlib.Path = koniq_root / "koniq10k_scores_and_distributions.csv"
     koniq_indicator_csv: pathlib.Path = koniq_root / "koniq10k_indicators.csv"
@@ -48,10 +47,10 @@ def process_koniq(dataset_root: pathlib.Path = Path("datasets/")) -> pandas.Data
 
     return joint_df
 
-def process_biq(dataset_root: pathlib.Path = Path("datasets/")) -> pandas.DataFrame:
+def process_biq(dataset_root: pathlib.Path = Path("datasets/")) -> pd.DataFrame:
     biq_root = dataset_root / "biq2021"
     biq_csv = biq_root / "BIQ2021.csv"
-    biq_image_path = biq_root / "images"
+    biq_image_path = biq_root
 
     score_df = pd.read_csv(biq_csv)
     score_df=score_df.rename(columns={"StandardDeviation":"SD","Images":"image_name"})
@@ -71,19 +70,50 @@ def process_biq(dataset_root: pathlib.Path = Path("datasets/")) -> pandas.DataFr
 
     return joint_df
 
+def clean_merged_dataset(df: pd.DataFrame) -> pd.DataFrame:
+    # remove duplicate columns
+    df = df.loc[:,~df.columns.duplicated()].copy()
+
+    # remove redundant columns that are created when reading CSVs with pandas
+    redundant_index_cols = [col for col in df.columns if col.startswith('Unnamed:')]
+    df = df.drop(columns=redundant_index_cols, errors='ignore')
+
+    # remove cols with no info
+    df = df.dropna(axis=1, how='all')
+
+    # remove constant columns except for identifiers
+    identifiers = {"image_name", "dataset"}
+    constant_cols = [col for col in df.columns if col not in identifiers and df[col].nunique(dropna=False) <= 1]
+    df = df.drop(columns=constant_cols)
+
+    return df
+
+
 if __name__ == "__main__":
 
     output_folder = Path('output/')
-    os.makedirs(output_folder, exist_ok=True)
+    output_folder.mkdir(parents=True, exist_ok=True)
+
     koniq_df = process_koniq()
     biq_df = process_biq()
 
-    koniq_df.to_csv(output_folder/'processed_koniq.csv')
-    biq_df.to_csv(output_folder/'processed_biq.csv')
-    # koniq_df = pd.read_csv(output_folder/'processed_koniq.csv')
-    # biq_df = pd.read_csv(output_folder/'processed_biq.csv')
+    koniq_df.to_csv(output_folder/'processed_koniq.csv', index=False)
+    biq_df.to_csv(output_folder/'processed_biq.csv', index=False)
+
     koniq_df['dataset'] = 'koniq'
     biq_df['dataset'] = 'biq2021'
 
-    joint_df = koniq_df.merge(biq_df, how='outer')
-    joint_df.to_csv(output_folder/'processed_merged.csv')
+    joint_df = pd.concat([koniq_df, biq_df], ignore_index=True, sort=False)
+
+    joint_df = clean_merged_dataset(joint_df)
+
+    joint_df = joint_df.reset_index(drop=True)
+
+    joint_df.to_csv(output_folder/'processed_merged.csv', index=False)
+
+    print(f"\nMerged dataset shape: {joint_df.shape}")
+    print("\nColumns: ")
+    print(joint_df.columns.tolist())
+
+    print("\nMissing values per column: ")
+    print(joint_df.isna().sum().sort_values(ascending=False))
