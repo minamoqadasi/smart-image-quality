@@ -225,3 +225,6 @@ datasets/
 
 # Generated output files
 output/
+
+#the DS store thing that macOS generates for no clear reason
+.DS_Store
