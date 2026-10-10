@@ -70,6 +70,18 @@ def process_biq(dataset_root: pathlib.Path = Path("datasets/")) -> pd.DataFrame:
 
     return joint_df
 
+def normalize_dataset(df: pd.DataFrame) -> pd.DataFrame:
+    excluded_columns = ['brightness_subjective','contrast_subjective','colorfulness_subjective','sharpness_subjective','MOS','SD']
+    numerical_columns = df.select_dtypes(include="number") #only makes sense to normalize on numeric columns
+    for column in numerical_columns:
+        if column not in excluded_columns: #no need to normalize the subjective columns, they're not even in both datasets
+            #basic min-max normalization to get to [0,1]
+            #NOT normalizing MOS and SD because those are already in [0,1] (and normalizing SD doesn't make sense anyways)
+            column_range = df[column].max() - df[column].min()
+            df[column] = (df[column] - df[column].min()) / column_range
+
+    return df
+
 def clean_merged_dataset(df: pd.DataFrame) -> pd.DataFrame:
     # remove duplicate columns
     df = df.loc[:,~df.columns.duplicated()].copy()
@@ -103,7 +115,7 @@ if __name__ == "__main__":
     koniq_df['dataset'] = 'koniq'
     biq_df['dataset'] = 'biq2021'
 
-    joint_df = pd.concat([koniq_df, biq_df], sort=False)
+    joint_df = normalize_dataset(pd.concat([koniq_df, biq_df], sort=False))
     joint_df.to_csv(output_folder / 'processed_merged.csv')
 
     joint_df = clean_merged_dataset(joint_df)
