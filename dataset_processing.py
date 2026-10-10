@@ -97,19 +97,19 @@ if __name__ == "__main__":
     koniq_df = process_koniq()
     biq_df = process_biq()
 
-    koniq_df.to_csv(output_folder/'processed_koniq.csv', index=False)
-    biq_df.to_csv(output_folder/'processed_biq.csv', index=False)
+    koniq_df.to_csv(output_folder/'processed_koniq.csv')
+    biq_df.to_csv(output_folder/'processed_biq.csv')
 
     koniq_df['dataset'] = 'koniq'
     biq_df['dataset'] = 'biq2021'
 
-    joint_df = pd.concat([koniq_df, biq_df], ignore_index=True, sort=False)
+    joint_df = pd.concat([koniq_df, biq_df], sort=False)
+    joint_df.to_csv(output_folder / 'processed_merged.csv')
 
     joint_df = clean_merged_dataset(joint_df)
 
-    joint_df = joint_df.reset_index(drop=True)
 
-    joint_df.to_csv(output_folder/'processed_merged.csv', index=False)
+    joint_df.to_csv(output_folder/'cleaned_merged.csv')
 
     print(f"\nMerged dataset shape: {joint_df.shape}")
     print("\nColumns: ")
